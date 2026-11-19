@@ -1,23 +1,141 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cover Snap</title>
-<link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vice City Nights — Cover Art Maker</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main class="app">
-  <section class="controls">
-    <h1>Cover Snap</h1>
-    <p>A photo and a caption, made into a square cover.</p>
-    <label>Photo <input id="photo" type="file" accept="image/*"></label>
-    <label>Caption <input id="caption" type="text" maxlength="40" value="Sunset Heist"></label>
-    <button id="export" type="button">Export PNG 1080 x 1080</button>
-    <p id="status" role="status"></p>
-  </section>
-  <canvas id="cover" width="1080" height="1080" aria-label="The cover"></canvas>
-</main>
-<script type="module" src="./src/main.js"></script>
+  <div class="app-container">
+    <!-- Editor Sidebar -->
+    <aside class="editor-sidebar" id="editorSidebar">
+      <header class="app-header">
+        <h1>VICE CITY NIGHTS</h1>
+        <p class="subtitle">GTA 6 Style Cover Art Maker</p>
+      </header>
+
+      <!-- Photos Section -->
+      <section class="control-section">
+        <h2>1. Photos</h2>
+        <div class="photo-sources">
+          <label class="btn-sample" id="samplePierBtn">Sample: Pier</label>
+          <label class="btn-sample" id="sampleBoulevardBtn">Sample: Boulevard</label>
+        </div>
+        <div class="file-input-wrapper">
+          <input type="file" id="photoUpload" accept="image/*" multiple>
+          <span class="file-label">Upload Photos (up to 3)</span>
+        </div>
+        <div class="uploaded-thumbs" id="uploadedThumbs"></div>
+      </section>
+
+      <!-- Layout Section -->
+      <section class="control-section">
+        <h2>2. Layout</h2>
+        <div class="layout-picker" id="layoutPicker">
+          <button class="layout-btn active" data-layout="tri">Tri-Panel</button>
+          <button class="layout-btn" data-layout="vertical">Vertical Strips</button>
+          <button class="layout-btn" data-layout="full">Full Bleed</button>
+        </div>
+      </section>
+
+      <!-- Panel Transform Section -->
+      <section class="control-section" id="panelControlsSection">
+        <h2>3. Panel Fine-Tune</h2>
+        <div class="panel-tabs" id="panelTabs">
+          <button class="panel-tab active" data-panel="0">Panel 1</button>
+          <button class="panel-tab" data-panel="1">Panel 2</button>
+          <button class="panel-tab" data-panel="2">Panel 3</button>
+        </div>
+        <div class="control-group">
+          <label>Assign Photo:</label>
+          <select id="panelPhotoSelect">
+            <option value="0">Photo 1</option>
+            <option value="1">Photo 2</option>
+            <option value="2">Photo 3</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Zoom: <span id="zoomVal">1.0</span>x</label>
+          <input type="range" id="panelZoom" min="1" max="3" step="0.05" value="1">
+        </div>
+        <div class="control-group">
+          <label>Offset X: <span id="offsetXVal">0</span>px</label>
+          <input type="range" id="panelOffsetX" min="-200" max="200" step="1" value="0">
+        </div>
+        <div class="control-group">
+          <label>Offset Y: <span id="offsetYVal">0</span>px</label>
+          <input type="range" id="panelOffsetY" min="-200" max="200" step="1" value="0">
+        </div>
+      </section>
+
+      <!-- Caption Section -->
+      <section class="control-section">
+        <h2>4. Caption & Styling</h2>
+        <div class="control-group">
+          <label>Caption Text (max 40 chars):</label>
+          <input type="text" id="captionInput" maxlength="40" value="SUNSET HEIST">
+        </div>
+        <div class="control-group">
+          <label>Position:</label>
+          <div class="radio-group">
+            <label><input type="radio" name="captionPos" value="top"> Top</label>
+            <label><input type="radio" name="captionPos" value="bottom" checked> Bottom</label>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Text Color:</label>
+          <select id="captionColor">
+            <option value="white">White</option>
+            <option value="pink" selected>Neon Pink</option>
+            <option value="cyan">Cyan</option>
+            <option value="gold">Gold</option>
+          </select>
+        </div>
+        <div class="control-group checkbox-group">
+          <label><input type="checkbox" id="captionOutline" checked> Heavy Outline & Shadow</label>
+        </div>
+      </section>
+
+      <!-- Color Grade & Grain Section -->
+      <section class="control-section">
+        <h2>5. Color Grade & Grain</h2>
+        <div class="grade-picker" id="gradePicker">
+          <button class="grade-btn active" data-grade="sunset">Vice Sunset</button>
+          <button class="grade-btn" data-grade="neon">Neon Night</button>
+          <button class="grade-btn" data-grade="ocean">Ocean Drive</button>
+          <button class="grade-btn" data-grade="noir">Noir B&W</button>
+        </div>
+        <div class="control-group checkbox-group" style="margin-top: 10px;">
+          <label><input type="checkbox" id="grainToggle" checked> Film Grain</label>
+        </div>
+      </section>
+
+      <!-- Size & Export Section -->
+      <section class="control-section">
+        <h2>6. Size & Export</h2>
+        <div class="control-group">
+          <label>Canvas Dimensions:</label>
+          <select id="canvasSizeSelect">
+            <option value="1080x1080" selected>Square (1080 x 1080)</option>
+            <option value="1080x1350">Portrait (1080 x 1350)</option>
+            <option value="1920x1080">Landscape (1920 x 1080)</option>
+          </select>
+        </div>
+        <button id="exportBtn" class="btn-primary">Download Cover PNG</button>
+      </section>
+    </aside>
+
+    <!-- Preview Canvas Area -->
+    <main class="preview-area">
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <canvas id="coverCanvas" width="1080" height="1080"></canvas>
+      </div>
+      <div id="exportDisplay" class="export-display hidden"></div>
+    </main>
+  </div>
+
+  <div id="shot-debug" style="display: none;"></div>
+  <script type="module" src="src/main.js"></script>
 </body>
 </html>
